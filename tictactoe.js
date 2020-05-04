@@ -50,18 +50,27 @@ const GameBoard = (() => {
         _boardChecker();
     };
 
-    const placeMarker = (tileID, marker) => {
-        _updateBoardArray(tileID, marker);
-    };
-
     const returnBoard = () => {
         return _board;
+    };
+
+    const resetBoard = () => {
+        _board = [
+            '','','',  // 0 1 2
+            '','','',  // 3 4 5
+            '','','',  // 6 7 8 
+        ];
+    }
+
+    const placeMarker = (tileID, marker) => {
+        _updateBoardArray(tileID, marker);
     };
 
     return {
         returnBoard,
         placeMarker,
         checkBoard,
+        resetBoard, 
     };
 
 })(); 
@@ -101,26 +110,24 @@ const Game = (() => {
         // Updates info screen according to whose turn it is
         if (_numTurns < 9 && _gameOn == true){
             if (_xTurn == true){
-                console.log("potato")
                 DisplayController.updateInfo(`It is ${playerX.getName()}'s turn.`);
             }
             else if (_oTurn == true){
-                console.log("tomato")
                 DisplayController.updateInfo(`It is ${playerO.getName()}'s turn.`);
             }
             GameBoard.checkBoard();
         }
         // Checks for a winner
         if (_numTurns == 9 && playerX.getWins() == playerO.getWins()){
-            alert("tie");
+            DisplayController.updateInfo("That's a tie.");
             _gameOn = false;
         }
         else if (playerX.getWins() > playerO.getWins()) {
-            alert("X wins");
+            DisplayController.updateInfo(`${playerX.getName()} wins!`);
             _gameOn = false;
         }
         else if (playerO.getWins() > playerX.getWins()) {
-            alert("O wins");
+            DisplayController.updateInfo(`${playerO.getName()} wins!`);
             _gameOn = false;
         }
 
@@ -139,8 +146,9 @@ const Game = (() => {
                 _oTurn = false;
                 _xTurn = true;
             }
+            play();
         }
-        play();
+        
     };
 
     const createPlayers = () => {
@@ -153,10 +161,25 @@ const Game = (() => {
         play();
     }
 
+    const restart = () => {
+        delete playerX;
+        delete playerO;
+        _gameOn = false;
+        _xTurn = false;
+        _oTurn = false;
+        _numTurns = 0;
+        GameBoard.resetBoard();
+        DisplayController.renderBoard();
+        DisplayController.updateInfo("Please begin by entering player names.");
+        document.getElementById("playerXName").value = "";
+        document.getElementById("playerOName").value = "";
+    }
+
     return {
         play,
         updateTile,
         createPlayers,
+        restart,
     };
 })();
 
