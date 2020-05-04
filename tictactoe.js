@@ -9,14 +9,13 @@ const GameBoard = (() => {
         '','','',  // 3 4 5
         '','','',  // 6 7 8 
     ];
-
+    // Update array with corresponding marker
     const _updateBoardArray = (tileID, marker) => {
-        let tile = tileID.replace( /^\D+/g, '');
+        let tile = tileID.replace( /^\D+/g, ''); // Remove everything that's not a number
         if (_board[tile] === ""){
             _board[tile] = marker;
         }
-    };
-
+    }
     // Checks for three in a row
     const _boardChecker = () => {
         // Check if x wins horizontally
@@ -43,34 +42,48 @@ const GameBoard = (() => {
         if (_board[0] === "o" && _board[4] === "o" && _board[8] === "o" || _board[6] === "o" && _board[4] === "o" && _board[2] === "o"){
             playerO.upWins();
         }
-
-    };
+    }
+    // Checks if a marker has already been placed on tile
+    const _isTileEmpty = (tileID) => {
+        let tile = tileID.replace( /^\D+/g, ''); // Remove everything that's not a number
+        if (_board[tile] === ""){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
     const checkBoard = () => {
         _boardChecker();
-    };
+    }
 
     const returnBoard = () => {
         return _board;
-    };
+    }
 
     const resetBoard = () => {
         _board = [
-            '','','',  // 0 1 2
-            '','','',  // 3 4 5
-            '','','',  // 6 7 8 
+            '','','', 
+            '','','', 
+            '','','', 
         ];
     }
 
     const placeMarker = (tileID, marker) => {
         _updateBoardArray(tileID, marker);
-    };
+    }
+
+    const tileEmpty = (tileID) => {
+       return _isTileEmpty(tileID);
+    }
 
     return {
         returnBoard,
         placeMarker,
         checkBoard,
         resetBoard, 
+        tileEmpty,
     };
 
 })(); 
@@ -83,8 +96,25 @@ const DisplayController = (() => {
             let pChild = document.getElementById(`tile${i}`).children;
             pChild[0].innerHTML = board[i];
         }
-    };
+    }
+    // Placeholder marker for tiles on hover
+    const _tileHoverState = (id, marker) => {
+        let div = document.getElementById(id);
+        let divText = div.children;
+        if (divText[0].innerHTML == ""){
+            divText[0].innerHTML = marker;
+            div.classList.add("playerHover");
+        }
+    }
 
+    const _removeHoverState = (id) => {
+        let div = document.getElementById(id);
+        let divText = div.children;
+        divText[0].innerHTML = "";
+        div.classList.remove("playerHover");
+    }
+
+    // Updates info screen below board
     const updateInfo = (text) => {
         document.getElementById("gameInfoText").innerHTML = text;
     }
@@ -93,9 +123,19 @@ const DisplayController = (() => {
         _boardRenderer();
     }
 
+    const tileHover = (id, marker) => {
+        _tileHoverState(id, marker);
+    }
+
+    const removeHover = (id) => {
+        _removeHoverState(id);
+    }
+
     return {
         renderBoard,
         updateInfo,
+        tileHover,
+        removeHover,
     };
 })();
 
@@ -106,9 +146,9 @@ const Game = (() => {
     let _oTurn = false;
     let _numTurns = 0;
     
-    const play = () => {
+    const _gameController = () => {
         // Updates info screen according to whose turn it is
-        if (_numTurns < 9 && _gameOn == true){
+        if (_numTurns <= 9 && _gameOn == true){
             if (_xTurn == true){
                 DisplayController.updateInfo(`It is ${playerX.getName()}'s turn.`);
             }
@@ -118,7 +158,7 @@ const Game = (() => {
             GameBoard.checkBoard();
         }
         // Checks for a winner
-        if (_numTurns == 9 && playerX.getWins() == playerO.getWins()){
+        if (_numTurns == 9){
             DisplayController.updateInfo("That's a tie.");
             _gameOn = false;
         }
@@ -130,38 +170,46 @@ const Game = (() => {
             DisplayController.updateInfo(`${playerO.getName()} wins!`);
             _gameOn = false;
         }
-
+        console.log(_numTurns);
         DisplayController.renderBoard();
-    };
-
-    const updateTile = (tileID) => {
+    }
+    // Places marker on tile
+    const _tileUpdater = (tileID) => {
         if (_gameOn == true){
-            if (_xTurn == true){
-                GameBoard.placeMarker(tileID, "x");
-                _xTurn = false;
-                _oTurn = true;
+            if (GameBoard.tileEmpty(tileID) == true){
+                if (_xTurn == true){
+                    GameBoard.placeMarker(tileID, "x");
+                    _xTurn = false;
+                    _oTurn = true;
+                }
+                else if (_oTurn == true) {
+                    GameBoard.placeMarker(tileID, "o");
+                    _oTurn = false;
+                    _xTurn = true;
+                }
+                _numTurns++;
+                _gameController();
             }
-            else if (_oTurn == true) {
-                GameBoard.placeMarker(tileID, "o");
-                _oTurn = false;
-                _xTurn = true;
-            }
-            play();
-        }
-        
-    };
+        } 
+    }
 
-    const createPlayers = () => {
+    const _playerCreater = () => {
         let xName = document.getElementById("playerXName").value;
         let oName = document.getElementById("playerOName").value;
+        if (xName == ""){
+            xName = "Player X";
+        }
+        if (oName == ""){
+            oName = "Player O";
+        }
         playerX = Player(xName, "x");
         playerO = Player(oName, "o");
         _gameOn = true;
         _xTurn = true;
-        play();
+        _gameController();
     }
 
-    const restart = () => {
+    const _resetEverything = () => {
         delete playerX;
         delete playerO;
         _gameOn = false;
@@ -174,12 +222,46 @@ const Game = (() => {
         document.getElementById("playerXName").value = "";
         document.getElementById("playerOName").value = "";
     }
+    // Placeholder marker for tiles on hover
+    const hoverTile = (id) => {
+        if (_gameOn == true){
+            if (_xTurn == true){
+                DisplayController.tileHover(id,"x");
+            }
+            else if (_oTurn == true) {
+                DisplayController.tileHover(id,"o");
+            }
+        } 
+    }
+
+    const removeHover = (id) => {
+        DisplayController.removeHover(id);
+        DisplayController.renderBoard();
+    }
+
+    const play = () => {
+        _gameController();
+    }
+
+    const updateTile = (tileID) => {
+        _tileUpdater(tileID);
+    }
+
+    const createPlayers = () => {
+        _playerCreater();
+    }
+
+    const reset = () => {
+        _resetEverything();
+    }
 
     return {
         play,
         updateTile,
         createPlayers,
-        restart,
+        reset,
+        hoverTile,
+        removeHover,
     };
 })();
 
