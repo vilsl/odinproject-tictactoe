@@ -9,41 +9,60 @@ Tic tac toe. Homework from The Odin Project. Do what you want with it. -vilsl
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
-        <div id="boardContainer">
-            <div class="tile">
-                <p id="tile0"></p>
+        <div id="content">
+            <div class="playerMenu">
+                <form id="newPlayerForm">
+                    <legend>Player X</legend>
+                    <input type="text" id="playerXName" name="name" placeholder="Player name">
+                    <legend>Player O</legend>
+                    <input type="text" id="playerOName" name="name" placeholder="Player name">
+                    <input type="button" id="newPlayerButton" value="Add players" onclick="Game.createPlayers()">
+                </form>
+    
+                <button id="restartButton">Restart</button>
+            </div>
+    
+            <div id="boardContainer">
+                <div class="tile" id="tile0" onclick="Game.updateTile(this.id)">
+                    <p></p>
+                </div>
+    
+                <div class="tile" id="tile1" onclick="Game.updateTile(this.id)">
+                    <p></p>
+                </div>
+
+                <div class="tile" id="tile2" onclick="Game.updateTile(this.id)">
+                    <p></p>
+                </div>
+
+                <div class="tile" id="tile3" onclick="Game.updateTile(this.id)">
+                    <p></p>
+                </div>
+
+                <div class="tile" id="tile4" onclick="Game.updateTile(this.id)">
+                    <p></p>
+                </div>
+
+                <div class="tile" id="tile5" onclick="Game.updateTile(this.id)">
+                    <p></p>
+                </div>
+
+                <div class="tile" id="tile6" onclick="Game.updateTile(this.id)">
+                    <p></p>
+                </div>
+
+                <div class="tile" id="tile7" onclick="Game.updateTile(this.id)">
+                    <p></p>
+                </div>
+
+                <div class="tile" id="tile8" onclick="Game.updateTile(this.id)">
+                    <p></p>
+                </div>
+               
             </div>
 
-            <div class="tile">
-                <p id="tile1"></p>
-            </div>
-
-            <div class="tile">
-                <p id="tile2"></p>
-            </div>
-
-            <div class="tile">
-                <p id="tile3"></p>
-            </div>
-
-            <div class="tile"> 
-                <p id="tile4"></p>
-            </div>
-
-            <div class="tile">
-                <p id="tile5"></p>
-            </div>
-
-            <div class="tile">
-                <p id="tile6"></p>
-            </div>
-
-            <div class="tile">
-                <p id="tile7"></p>
-            </div>
-
-            <div class="tile"> 
-                <p id="tile8"></p>
+            <div id="gameInfo">
+                <p id="gameInfoText">Please begin by entering player names.</p>
             </div>
         </div>
     </body>
