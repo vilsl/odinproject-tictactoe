@@ -6,3 +6,6 @@ The game can be found online [here](https://vilsl.github.io/odinproject-tictacto
 
 ## Built with
 Just standard Javascript.
+
+## Disclaimer
+It might break on some resolutions or zoom levels.
